@@ -1,4 +1,7 @@
+// activity/activity_screen.dart
+
 import 'package:flutter/material.dart';
+import '../core/app_theme.dart';
 
 class ActivityScreen extends StatelessWidget {
   const ActivityScreen({super.key});
@@ -6,66 +9,116 @@ class ActivityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.scaffoldBg,
       appBar: AppBar(
         title: const Text(
-          "Activity",
-          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24),
+          'Activity',
+          style: TextStyle(
+              fontWeight: FontWeight.w900, fontSize: 24, color: Colors.white),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list_rounded, color: Colors.white54),
+            onPressed: () {},
+          )
+        ],
       ),
       body: ListView(
         children: [
-          // Section 1: New Notifications
-          const _ActivityHeader(title: "New"),
-          _buildActivityItem(0, "liked your photo.", true),
-          _buildActivityItem(1, "started following you.", false, isFollow: true),
+          _sectionHeader('New'),
+          _item(0, 'buzzed your post. 🐝', true),
+          _item(1, 'started following you.', false, isFollow: true),
 
-          const Divider(color: Colors.white10, indent: 70),
+          const Divider(color: AppTheme.dividerColor, indent: 70, height: 8),
 
-          // Section 2: This Week
-          const _ActivityHeader(title: "This Week"),
-          _buildActivityItem(2, "commented: 'Amazing shot! 🔥'", true),
-          _buildActivityItem(3, "liked your photo.", true),
-          _buildActivityItem(4, "started following you.", false, isFollow: true),
-          _buildActivityItem(5, "mentioned you in a comment.", true),
+          _sectionHeader('This Week'),
+          _item(2, 'commented: "That hive aesthetic 🔥"', true),
+          _item(3, 'buzzed your post.', true),
+          _item(4, 'started following you.', false, isFollow: true),
+          _item(5, 'mentioned you in a comment.', true),
 
-          const Divider(color: Colors.white10, indent: 70),
+          const Divider(color: AppTheme.dividerColor, indent: 70, height: 8),
 
-          // Section 3: Suggested for you
-          const _ActivityHeader(title: "Suggested for you"),
-          _buildActivityItem(6, "is on Instamax. Follow them to see their posts.", false, isFollow: true, isSuggestion: true),
+          _sectionHeader('Suggested for You'),
+          _item(6, 'is on HiVE. Follow them to see their posts.', false,
+              isFollow: true, isSuggested: true),
+          _item(7, 'is on HiVE. Follow them to see their posts.', false,
+              isFollow: true, isSuggested: true),
+          _item(8, 'is on HiVE. Follow them to see their posts.', false,
+              isFollow: true, isSuggested: true),
+          const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  // Helper function to build different types of activity rows
-  Widget _buildActivityItem(int i, String action, bool hasThumbnail, {bool isFollow = false, bool isSuggestion = false}) {
+  static Widget _sectionHeader(String title) => Padding(
+    padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+    child: Text(
+      title,
+      style: const TextStyle(
+          fontWeight: FontWeight.w800,
+          fontSize: 15,
+          color: Colors.white),
+    ),
+  );
+
+  static Widget _item(
+      int i,
+      String action,
+      bool hasThumbnail, {
+        bool isFollow = false,
+        bool isSuggested = false,
+      }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
       child: Row(
         children: [
-          // User Profile Picture
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: Colors.white10,
-            backgroundImage: NetworkImage("https://i.pravatar.cc/150?u=user$i"),
+          // Avatar with yellow ring for "new"
+          Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppTheme.primary,
+                ),
+                child: CircleAvatar(
+                  radius: 23,
+                  backgroundImage:
+                  NetworkImage('https://i.pravatar.cc/150?u=hive_act$i'),
+                ),
+              ),
+              if (isSuggested)
+                const Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: CircleAvatar(
+                    radius: 9,
+                    backgroundColor: AppTheme.primary,
+                    child: Text('🐝', style: TextStyle(fontSize: 10)),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(width: 12),
 
-          // Notification Text
+          // Text
           Expanded(
             child: RichText(
               text: TextSpan(
-                style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.3),
+                style: const TextStyle(
+                    color: Colors.white, fontSize: 13, height: 1.4),
                 children: [
                   TextSpan(
-                    text: "username_$i ",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    text: 'buzzer_$i ',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   TextSpan(text: action),
                   TextSpan(
-                    text: "  ${i + 1}h",
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    text: '  ${i + 1}h',
+                    style: const TextStyle(
+                        color: AppTheme.textSecondary, fontSize: 11),
                   ),
                 ],
               ),
@@ -73,47 +126,56 @@ class ActivityScreen extends StatelessWidget {
           ),
           const SizedBox(width: 10),
 
-          // Action: Either a Thumbnail of a post OR a Follow Button
+          // Right side: thumbnail or follow button
           if (hasThumbnail)
             ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(6),
               child: Image.network(
-                "https://picsum.photos/seed/post$i/100/100",
-                width: 40,
-                height: 40,
+                'https://picsum.photos/seed/act$i/100/100',
+                width: 44,
+                height: 44,
                 fit: BoxFit.cover,
               ),
             )
           else if (isFollow)
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.cyanAccent,
-                foregroundColor: Colors.black,
-                minimumSize: const Size(80, 32),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                elevation: 0,
-              ),
-              child: const Text("Follow", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-            ),
+            _FollowButton(),
         ],
       ),
     );
   }
 }
 
-// Custom Header Widget for sections
-class _ActivityHeader extends StatelessWidget {
-  final String title;
-  const _ActivityHeader({required this.title});
+class _FollowButton extends StatefulWidget {
+  @override
+  State<_FollowButton> createState() => _FollowButtonState();
+}
+
+class _FollowButtonState extends State<_FollowButton> {
+  bool _following = false;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-      child: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+    return GestureDetector(
+      onTap: () => setState(() => _following = !_following),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding:
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        decoration: BoxDecoration(
+          color: _following ? AppTheme.surfaceBg : AppTheme.primary,
+          borderRadius: BorderRadius.circular(10),
+          border: _following
+              ? Border.all(color: AppTheme.dividerColor)
+              : null,
+        ),
+        child: Text(
+          _following ? 'Following' : 'Follow',
+          style: TextStyle(
+            color: _following ? Colors.white : Colors.black,
+            fontWeight: FontWeight.w700,
+            fontSize: 12,
+          ),
+        ),
       ),
     );
   }
