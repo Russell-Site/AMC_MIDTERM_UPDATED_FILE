@@ -225,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         TextSpan(text: "Don't have an account? "),
                         TextSpan(
-                          text: 'Join the Hive',
+                          text: 'Join the Hive People',
                           style: TextStyle(
                               color: AppTheme.primary,
                               fontWeight: FontWeight.bold),
